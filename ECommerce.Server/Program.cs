@@ -2,6 +2,7 @@ using ECommerce.Server;
 using Microsoft.EntityFrameworkCore;
 using ECommerce.Data.SQL.Context;
 using Microsoft.Extensions.Configuration;
+using ECommerce.Services.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,17 @@ builder.Services.AddDbContext<DataBaseContext>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IPaymentsGateway>(x =>
+{
+    var logger = x.GetRequiredService<ILogger<StripePaymentsGatewayService>>();
+    string stripeSecretKey = builder.Configuration.GetSection("Stripe").GetValue<string>("secretKey");
+    string stripePublicKey = builder.Configuration.GetSection("Stripe").GetValue<string>("publicKey");
+
+    if (string.IsNullOrEmpty(stripeSecretKey) || string.IsNullOrEmpty(stripePublicKey))
+        logger.LogError("Stripe keys are missing.");
+    return new StripePaymentsGatewayService(logger, stripeSecretKey);
+});
 
 builder.Services.AddCors(o =>
 {

@@ -12,7 +12,7 @@ namespace ECommerce.Services.Payments
     {
         Task<List<PlanModel>> PopulatePlans(List<PlanModel> plans);
 
-        Task<bool> CreateCustomer(string name, string email, string systemId);
+        Task<bool> CreateCustomer(CreateCustomerDTO model);
         Task<List<CustomerModel>> GetCustomers(int take);
         Task<CustomerModel> GetCustomerByEmail(string email, params PaymentModelInclude[] include);
         Task<CustomerModel> DeleteCustomerByEmail(string email);

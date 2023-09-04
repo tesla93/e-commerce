@@ -15,6 +15,8 @@ namespace ECommerce.Services.Payments
             StripeConfiguration.ApiKey = apiKey;
         }
 
+        #region Customers_Services
+
         public async Task<List<CustomerModel>> GetCustomers(int take)
         {
             var service = new CustomerService();
@@ -58,18 +60,18 @@ namespace ECommerce.Services.Payments
             return customerModel;
         }
 
-        public async Task<bool> CreateCustomer(string name, string email, string systemId)
+        public async Task<bool> CreateCustomer(CreateCustomerDTO model)
         {
             this._logger.LogInformation("Creating Customer in Stripe");
             try
             {
                 var options = new CustomerCreateOptions
                 {
-                    Email = email,
-                    Name = name,
+                    Email = model.Email,
+                    Name = model.Name,
                     Metadata = new Dictionary<string, string>()
                     {
-                        { "ID", systemId}
+                        { "ID", model.SystemId ?? string.Empty}
                     }
                 };
                 var service = new CustomerService();
@@ -103,6 +105,10 @@ namespace ECommerce.Services.Payments
                 SystemId = deletedStripeCustomer.Metadata?.GetValueOrDefault("ID")
             };
         }
+
+        #endregion
+
+
 
         public async Task<List<PlanModel>> PopulatePlans(List<PlanModel> plans)
         {
@@ -385,7 +391,7 @@ namespace ECommerce.Services.Payments
 
 
         public async Task ChargeWithCustomerEmail(string customerEmail, string paymentMethodId, Currency currency, long unitAmount,
-            bool sendEmailAfterSuccess = false, string emailDescription = "")
+            bool sendEmailAfterSuccess = true, string emailDescription = "")
         {
             var customer = await GetCustomerByEmail(customerEmail);
             await Charge(customer.Id, paymentMethodId, currency, unitAmount, customerEmail, sendEmailAfterSuccess, emailDescription);
@@ -395,7 +401,7 @@ namespace ECommerce.Services.Payments
         // -> https://dashboard.stripe.com/settings/billing/invoice
         // in case of email send uppon failure -> https://dashboard.stripe.com/settings/billing/automatic
         public async Task Charge(string customerId, string paymentMethodId,
-            Currency currency, long unitAmount, string customerEmail, bool sendEmailAfterSuccess = false, string emailDescription = "")
+            Currency currency, long unitAmount, string customerEmail, bool sendEmailAfterSuccess = true, string emailDescription = "")
         {
             try
             {

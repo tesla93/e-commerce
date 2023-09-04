@@ -9,7 +9,8 @@
     public enum Currency
     {
         Eur,
-        USD
+        USD,
+        MXN
     }
 
     public enum PaymentMethodType

@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\ECommerce.Data.SQL.csproj" />
     <ProjectReference Include="..\ECommerce.Data.SQL\ECommerce.Data.SQL.csproj" />
+    <ProjectReference Include="..\ECommerce.Services\ECommerce.Services.csproj" />
   </ItemGroup>
 
 </Project>
